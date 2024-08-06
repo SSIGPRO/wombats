@@ -14,5 +14,3 @@ detectors/__pycache__/gaussian_distribution_based.cpython-39.pyc
 detectors/__pycache__/ml_based.cpython-39.pyc
 detectors/__pycache__/pca_based.cpython-39.pyc
 notebooks/.ipynb_checkpoints/demo_detectors-checkpoint.ipynb
-notebooks/demo_detectors.ipynb
-notebooks/demo_mixture.ipynb
