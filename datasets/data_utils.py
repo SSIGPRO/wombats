@@ -3,15 +3,11 @@ import sys
 import pandas as pd
 import numpy as np
 
-
 def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=False, SNRdB=40):
     
     data_path_dic = {
-                     'bridge': os.path.join('..', '..', '..',
-                                            'bridge-data',
-                                           f'instances-sensor=1D30-period=2017-10-02 00:00:00-2017-10-08 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-train.pkl'),
-                     'ecg': os.path.join('..', '..', '..',
-                                         'ecg-data', f'ecgSyn_n={n}_scaled_train_snr={SNRdB}dB.pkl'),
+                     'bridge': os.path.join('..', 'datasets', 'bridge', f'instances-sensor=1D30-period=2017-10-02 00:00:00-2017-10-08 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-train.pkl'),
+                     'ecg': os.path.join('..', 'datasets', 'ecg', f'ecgSyn_n={n}_scaled_train_snr={SNRdB}dB.pkl'),
                      # 'ecg_ar': os.path.join('..', 'ecg-data', f'ar_n={n}_ecgSyn_n512_Ny256_(HR 80 100)_scaled_train.pkl')
                     }
 
@@ -65,13 +61,10 @@ def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=F
 
 
 def load_data_test(channels, n, data_type=None, data_path=None, augmentation=False, SNRdB=40):
+    print(os.listdir())
     data_path_dic = {
-                     'bridge': os.path.join('..', '..', '..',
-                                            'bridge-data',
-                                            f'instances-sensor=1D30-period=2017-10-09 00:00:00-2017-10-15 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-test.pkl'),
-                     'ecg': os.path.join('..', '..', '..',
-                                         'ecg-data',
-                                         f'ecgSyn_n={n}_scaled_test_snr={SNRdB}dB.pkl')
+                     'bridge': os.path.join('..', 'datasets', 'bridge', f'instances-sensor=1D30-period=2017-10-09 00:00:00-2017-10-15 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-test.pkl'),
+                     'ecg': os.path.join('..', 'datasets', 'ecg', f'ecgSyn_n={n}_scaled_test_snr={SNRdB}dB.pkl')
                     }
     
     if data_path is None:
