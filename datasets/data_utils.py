@@ -61,7 +61,6 @@ def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=F
 
 
 def load_data_test(channels, n, data_type=None, data_path=None, augmentation=False, SNRdB=40):
-    print(os.listdir())
     data_path_dic = {
                      'bridge': os.path.join('..', 'datasets', 'bridge', f'instances-sensor=1D30-period=2017-10-09 00:00:00-2017-10-15 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-test.pkl'),
                      'ecg': os.path.join('..', 'datasets', 'ecg', f'ecgSyn_n={n}_scaled_test_snr={SNRdB}dB.pkl')
