@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import signal
-from detectors._base import Detector
-from detectors._auto_regressive import burg
+from wombats.detectors._base import Detector
+from wombats.detectors._auto_regressive import burg
 
 
 class MD(Detector):

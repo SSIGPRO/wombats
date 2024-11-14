@@ -1,5 +1,5 @@
 import numpy as np
-from detectors._base import Detector
+from wombats.detectors._base import Detector
 
 
 class PCA(Detector):

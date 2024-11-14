@@ -5,9 +5,9 @@ from scipy import linalg
 from scipy import interpolate
 from scipy import signal
 
-from anomalies.increasing import *
-from anomalies.invariant import *
-from anomalies.decreasing import *
+from wombats.anomalies.increasing import *
+from wombats.anomalies.invariant import *
+from wombats.anomalies.decreasing import *
 
 import matplotlib.pyplot as plt
 

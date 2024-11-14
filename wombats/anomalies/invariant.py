@@ -1,6 +1,6 @@
 import numpy as np
-from anomalies._base import Anomaly
-from anomalies.increasing import Disturbance, GWN, Constant
+from wombats.anomalies._base import Anomaly
+from wombats.anomalies.increasing import Disturbance, GWN, Constant
 from scipy import optimize
 from scipy import linalg
 from scipy import interpolate
