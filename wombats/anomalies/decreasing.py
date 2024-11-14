@@ -1,5 +1,5 @@
 import numpy as np
-from anomalies._base import Anomaly
+from wombats.anomalies._base import Anomaly
 from scipy import optimize
 
 class Decreasing(Anomaly):
