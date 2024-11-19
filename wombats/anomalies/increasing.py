@@ -1,6 +1,7 @@
 import numpy as np
 from wombats.anomalies._base import Anomaly
 from scipy import signal
+import warnings
 
 class Disturbance(Anomaly):
     def __init__(self, delta):
@@ -103,6 +104,8 @@ class GNN(Disturbance):
         Lags = Rows - Cols
             
         disturbance = np.zeros((N, self.n))
+        warnings.filterwarnings("error", category=RuntimeWarning)  # Treat warnings as exceptions
+
         i = 0
         for f0, band in zip(f0_array, band_array):
             try:
