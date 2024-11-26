@@ -111,7 +111,7 @@ class GNN(Disturbance):
             
             while not check:
                 cov=np.cos(2*np.pi*Lags*f0) * np.sinc(Lags*band)
-                try 
+                try: 
                     w, V = np.linalg.eigh(cov)
                     w[w < 0] = 0 # Ensure positive semi-definite covariance matrix
                     check = True
@@ -120,7 +120,7 @@ class GNN(Disturbance):
                     f0 = np.random.uniform(0, fs/2)
                     band = np.random.uniform(0, fs/2 - np.abs(2*f0 - fs/2))
                     
-            disturbance[i] = np.random.randn(1, n) @ (V * np.sqrt(w)).T 
+            disturbance[i] = np.random.randn(1, self.n) @ (V * np.sqrt(w)).T 
             
         disturbance = self.a * disturbance
         
