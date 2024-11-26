@@ -104,30 +104,23 @@ class GNN(Disturbance):
         Lags = Rows - Cols
             
         disturbance = np.zeros((N, self.n))
-        warnings.filterwarnings("error", category=RuntimeWarning)  # Treat warnings as exceptions
 
-        i = 0
-        for f0, band in zip(f0_array, band_array):
-            try:
-                disturbance[i] = np.random.multivariate_normal(
-                    mean=np.zeros(self.n),
-                    cov=np.cos(2*np.pi*Lags*f0) * np.sinc(Lags*band),
-                    size=1)
-            except:
-                awgn = np.random.normal(size=length)
-                taps = signal.firwin(
-                    numtaps=num_taps,
-                    cutoff=[f0 - band/2, f0 + band/2],
-                    width=None,
-                    window=window,
-                    pass_zero=pass_zero,
-                    scale=True,
-                    fs=1
-                )
-                filtered = signal.lfilter(taps, 1.0, awgn)[num_taps : num_taps + self.n] 
-                disturbance[i] = filtered/ np.sqrt(np.sum(taps**2))
-                
-            i = i+1
+        for i in range(N):
+            f0, band = f0_array[i], band_array[i]
+            check = False
+            
+            while not check:
+                cov=np.cos(2*np.pi*Lags*f0) * np.sinc(Lags*band)
+                try 
+                    w, V = np.linalg.eigh(cov)
+                    w[w < 0] = 0 # Ensure positive semi-definite covariance matrix
+                    check = True
+                except:
+                    # in case of error generate a new pair of f0 and band
+                    f0 = np.random.uniform(0, fs/2)
+                    band = np.random.uniform(0, fs/2 - np.abs(2*f0 - fs/2))
+                    
+            disturbance[i] = np.random.randn(1, n) @ (V * np.sqrt(w)).T 
             
         disturbance = self.a * disturbance
         
