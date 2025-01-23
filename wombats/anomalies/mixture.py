@@ -1,10 +1,5 @@
 import numpy as np
 
-from scipy import optimize
-from scipy import linalg
-from scipy import interpolate
-from scipy import signal
-
 from wombats.anomalies.increasing import *
 from wombats.anomalies.invariant import *
 from wombats.anomalies.decreasing import *
@@ -12,15 +7,25 @@ from wombats.anomalies.decreasing import *
 import matplotlib.pyplot as plt
 
 
-def deviation_fully(delta_spectrum, delta_basis, Xok, SNRdB=None):
+def deviation_fully(delta_spectrum: float, delta_basis: float, Xok: np.ndarray, SNRdB: float = None) -> float:
+    """
+    Computes the deviation based on the spectral and principal subspace alterations.
 
+    :param delta_spectrum: The deviation parameter for spectral alteration.
+    :param delta_basis: The deviation parameter for principal subspace alteration.
+    :param Xok: A 2D array containing normal data (N, n).
+    :param SNRdB: Signal-to-noise ratio in decibels (optional).
+
+    :return: A scalar value representing the deviation.
+    """
+    # Apply spectral and basis alterations
     spectrum = SpectralAlteration(delta_spectrum).fit(Xok, SNRdB)
     basis = PrincipalSubspaceAlteration(delta_basis).fit(Xok)
     
     loks_sqrt = np.sqrt(spectrum.loks)
     lokn_sqrt = np.sqrt(spectrum.lokn)
     
-    # rotate sqrt of eighenvalues and build marix C
+    # Rotate sqrt of eighenvalues and build marix C
     lkos_sqrt = spectrum.Rb_theta @ loks_sqrt
     lko_sqrt = np.concatenate([lkos_sqrt, lokn_sqrt])
     
@@ -31,8 +36,19 @@ def deviation_fully(delta_spectrum, delta_basis, Xok, SNRdB=None):
     return 2 * energy_per_component - (2/spectrum.n) * np.trace(C)
 
 
-def mix(mixture, deviation, Xok, SNRdB=None, verbose=True):
-    # normalize anomaly weights
+def mix(mixture: dict, deviation: float, Xok: np.ndarray, SNRdB: float = None, verbose: bool = True) -> np.ndarray:
+    """
+    Applies various anomaly distortions based on a mixture of different anomaly types.
+
+    :param mixture: A dictionary where keys are anomaly types (e.g., 'SpectralAlteration') and values are their corresponding deviations.
+    :param deviation: The overall deviation to apply.
+    :param Xok: A 2D array containing normal data (N, n).
+    :param SNRdB: Signal-to-noise ratio in decibels (optional).
+    :param verbose: If True, plots the deviation comparison.
+
+    :return: The distorted data after applying all anomalies.
+    """
+    # Normalize anomaly weights
     anomalies = list(mixture.keys())
     weights = list(mixture.values())
     weights = weights/np.sum(weights)
@@ -41,10 +57,10 @@ def mix(mixture, deviation, Xok, SNRdB=None, verbose=True):
     
     Xko = Xok.copy()
     
-    # apply first SpectralAlteration and then PrincipalSubspaceAlteration anomalies 
+    # Apply first SpectralAlteration and then PrincipalSubspaceAlteration anomalies 
     if ('SpectralAlteration' in anomalies) and ('PrincipalSubspaceAlteration' in anomalies):
         
-        # invert function relating imposed deviation (delta) and resulting deviation (deviation)
+        # Invert function relating imposed deviation (delta) and resulting deviation (deviation)
         delta_spectrum = mixture['SpectralAlteration']
         delta_basis = mixture['PrincipalSubspaceAlteration']
         deviation = delta_spectrum + delta_basis
@@ -77,32 +93,40 @@ def mix(mixture, deviation, Xok, SNRdB=None, verbose=True):
                
     elif ('SpectralAlteration' in anomalies):
         delta = mixture['SpectralAlteration']
-        subspace = anomalies_dict['SpectralAlteration'](delta).fit(Xok, SNRdB)
+        subspace = SpectralAlteration(delta).fit(Xok, SNRdB)
         Xko = subspace.distort(Xko)
         mixture.pop('SpectralAlteration')
         
     elif 'PrincipalSubspaceAlteration' in anomalies:
         delta = mixture['PrincipalSubspaceAlteration']
-        subspace = anomalies_dict['PrincipalSubspaceAlteration'](delta).fit(Xok)
+        subspace = PrincipalSubspaceAlteration(delta).fit(Xok)
         Xko = subspace.distort(Xko)
         mixture.pop('PrincipalSubspaceAlteration')
     
-    # apply first Clipping and Dead-Zone anomalies   
+    # Apply first Clipping and Dead-Zone anomalies   
     elif 'Clipping' in anomalies:
         delta = mixture['Clipping']
-        decreasing = anomalies_dict['Clipping'](delta).fit(Xok)
+        decreasing = Clipping(delta).fit(Xok)
         Xko = decreasing.distort(Xko)  
         mixture.pop('Clipping')
         
     elif 'Dead-Zone' in anomalies:
         delta = mixture['Dead-Zone']
-        decreasing = anomalies_dict['Dead-Zone'](delta).fit(Xok)
+        decreasing = DeadZone(delta).fit(Xok)
         Xko = decreasing.distort(Xko)  
         mixture.pop('Dead-Zone')
         
-    # apply increasing anomalies
-    for (anomaly, delta) in mixture.items():  
-        Xko = anomalies_dict[anomaly](delta).fit(Xok).distort(Xko)      
+    # Apply increasing anomalies
+    increasing_anomalies ={
+        'GWN': GWN,
+        'Impulse': Impulse,
+        'Step': Step,
+        'Constant': Constant,  
+        'GNN': GNN
+    }
+    for (anomaly, delta) in mixture.items():
+        
+        Xko = increasing_anomalies[anomaly](delta).fit(Xok).distort(Xko)      
     return Xko
         
         
