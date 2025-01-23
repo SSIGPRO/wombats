@@ -1,25 +1,18 @@
 import os
 import pandas as pd
 import numpy as np
+from . import DATA_DIR
 
 def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=False, SNRdB=40):
     
     data_path_dic = {
-                     'bridge': os.path.join('..', 'bridge', f'instances-sensor=1D30-period=2017-10-02 00:00:00-2017-10-08 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-train.pkl'),
-                     'ecg': os.path.join('..', 'ecg', f'ecgSyn_n={n}_scaled_train_snr={SNRdB}dB.pkl'),
-                     # 'ecg_ar': os.path.join('..', 'ecg-data', f'ar_n={n}_ecgSyn_n512_Ny256_(HR 80 100)_scaled_train.pkl')
+                     'bridge': os.path.join(DATA_DIR, 'bridge', f'instances-sensor=1D30-period=2017-10-02 00:00:00-2017-10-08 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-train.pkl'),
+                     'ecg': os.path.join(DATA_DIR, 'ecg', f'ecgSyn_n={n}_scaled_train_snr={SNRdB}dB.pkl')
                     }
 
     X = pd.read_pickle(data_path_dic[data_type]).dropna(axis=0)
-    if data_type == 'satellite':
-        X = X[X['AOC_mode'] == 1282]
-        X = X[channels].values
-        nch = len(channels)
-        ninst = len(X) // (nch * n)
-        X = X[:ninst * nch * n]
-        X = X.reshape(ninst,nch,n).swapaxes(1, 2)
             
-    elif data_type in ['rfi', 'bridge']:
+    if data_type == 'bridge':
         X = X[channels].values
         nch = len(channels)
         ninst = len(X)
@@ -27,7 +20,7 @@ def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=F
         X = X.reshape(new_shape)
         X = X.swapaxes(1, 2)
         
-    elif 'ecg' in data_type:
+    elif data_type == 'ecg':
         nch = 1
         ninst = len(X)
         X = X.values.reshape((ninst, n, nch))
@@ -40,25 +33,14 @@ def load_data_training(channels, n, data_type=None, val_frac=0.1, augmentation=F
     return X_train, X_val
 
 
-def load_data_test(channels, n, data_type=None, data_path=None, augmentation=False, SNRdB=40):
+def load_data_test(channels, n, data_type=None, SNRdB=40):
     data_path_dic = {
-                     'bridge': os.path.join('..', 'wombats', 'datasets', 'bridge', f'instances-sensor=1D30-period=2017-10-09 00:00:00-2017-10-15 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-test.pkl'),
-                     'ecg': os.path.join('..', 'wombats', 'datasets', 'ecg', f'ecgSyn_n={n}_scaled_test_snr={SNRdB}dB.pkl')
+                     'bridge': os.path.join(DATA_DIR, 'bridge', f'instances-sensor=1D30-period=2017-10-09 00:00:00-2017-10-15 23:59:59-ch=x_y_z-n={n}-fs=100-mode=channel-test.pkl'),
+                     'ecg': os.path.join(DATA_DIR, 'ecg', f'ecgSyn_n={n}_scaled_test_snr={SNRdB}dB.pkl')
                     }
     
-    if data_path is None:
-        data_path = data_path_dic[data_type]
-    X = pd.read_pickle(data_path).dropna(axis=0)
-    if data_type == 'satellite':
-        X = X[X['AOC_mode'] == 1282]
-        X = X[ : '2019-04-15']
-        X = X[channels].values
-        nch = len(channels)
-        # ninst = len(X) // (nch * n)
-        ninst = 10_000
-        X = X[:ninst * nch * n]
-        X = X.reshape(ninst,nch,n).swapaxes(1, 2)
-    elif data_type in ['rfi', 'bridge']:
+    X = pd.read_pickle(data_path_dic[data_type]).dropna(axis=0)
+    if data_type == 'bridge':
         X = X[channels].values
         nch = len(channels)
         new_shape = (-1, nch, X.shape[1]//nch)
