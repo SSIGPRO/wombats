@@ -4,44 +4,70 @@ from scipy import signal
 import warnings
 
 class Disturbance(Anomaly):
+    """
+    Initialize the Disturbance (power-increasing) anomaly.
+    
+    :param delta: The target deviation value.
+    """
     def __init__(self, delta):
         super().__init__(delta)
         self.a = self._invert_deviation()
     
-    def _invert_deviation(self):
+    def _invert_deviation(self) -> float:
         return np.sqrt(self.delta)
     
-    def generate(self, N):
+    def generate(self, N: int):
+        """
+        Generate disturbance (to be implemented by subclasses).
+        
+        :param N: The number of instances to generate.
+        :return: The generated disturbance signal.
+        """
         return disurbance
     
-    def distort(self, Xok):
-        if Xok.ndim == 1:
-            N = 1
-        else:
-            N = Xok.shape[-2]
+    def distort(self, Xok: np.ndarray) -> np.ndarray:
+        """
+        Apply disturbance to the signal.
+        
+        :param Xok: A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
+        :return: The distorted signal.
+        """
+        N = 1 if Xok.ndim == 1 else Xok.shape[-2]
         disturbance = self.generate(N)
         return disturbance + Xok 
     
 
 class Constant(Disturbance):
     
-    def generate(self, N):
-        # sign of the constant distrubance
+    def generate(self, N: int) -> np.ndarray:
+        """
+        Generate constant disturbance.
+        
+        :param N: The number of instances to generate.
+        :return: The generated constant disturbance.
+        """
+        # Sign of the constant distrubance
         sign_array = np.random.choice(np.arange(-1, 2, 2), size=N)[..., None]
         disturbance = self.a * sign_array * np.ones(shape=(N, self.n))
-        if N == 1:
-            disturbance = disturbance[0]
+        if N == 1: disturbance = disturbance[0]
         return disturbance
     
     
 class Step(Disturbance):
     
-    def generate(self, N):
-        # randomly select rising or falling step
+    def generate(self, N: int) -> np.ndarray:
+        """
+        Generate step disturbance.
+        
+        :param N: The number of instances to generate.
+        :return: The generated step disturbance.
+        """
+        # Randomly select rising or falling step
         r_array = np.random.choice(np.arange(-1, 2, 2), size=N)[..., None]
-        # step position in the middle of the instance
+        # Step position in the middle of the instance
         j_array = (self.n//2) * np.ones(shape=N, dtype=int)
-        # sing of the constant distrubance
+        # Sign of the constant distrubance
         sign_array = np.random.choice(np.arange(-1, 2, 2), size=N)[..., None]
         
         disturbance =  np.array(
@@ -52,17 +78,22 @@ class Step(Disturbance):
              for j, r in zip(j_array, r_array)])
         disturbance = self.a * sign_array * disturbance
         
-        if N == 1:
-            disturbance = disturbance[0]
+        if N == 1: disturbance = disturbance[0]
         return disturbance
     
     
 class Impulse(Disturbance):
 
-    def generate(self, N):
-        # impulse position in the middle of the instance
+    def generate(self, N: int) -> np.ndarray:
+        """
+        Generate impulse disturbance.
+        
+        :param N: The number of instances to generate.
+        :return: The generated impulse disturbance.
+        """
+        # Impulse position in the middle of the instance
         j_array = (self.n//2) * np.ones(shape=N, dtype=int)
-        # sign of the constant distrubance
+        # Sign of the constant distrubance
         sign_array = np.random.choice(np.arange(-1, 2, 2), size=N)[..., None]
         
         disturbance = np.zeros(shape=(N, self.n))
@@ -70,14 +101,19 @@ class Impulse(Disturbance):
         disturbance[(idx, j_array[idx])] = np.sqrt(self.n)
         disturbance = self.a * sign_array * disturbance
         
-        if N == 1:
-            disturbance = disturbance[0]
+        if N == 1: disturbance = disturbance[0]
         return disturbance
     
 
 class GWN(Disturbance):
         
-    def generate(self, N):
+    def generate(self, N: int) -> np.ndarray:
+        """
+        Generate Gaussian white noise (GWN) disturbance.
+        
+        :param N: The number of instances to generate.
+        :return: The generated GWN disturbance.
+        """
         disturbance = self.a * np.random.normal(size=(N, self.n))
         if N == 1:
             disturbance = disturbance[0]      
@@ -86,12 +122,13 @@ class GWN(Disturbance):
     
 class GNN(Disturbance):
         
-    def generate(self, N):
-                
-        window='boxcar'
-        pass_zero='bandpass'
-        num_taps=1001
-        length = self.n + num_taps
+    def generate(self, N: int) -> np.ndarray:
+        """
+        Generate Gaussian noise with a non-stationary spectrum (GNN).
+        
+        :param N: The number of instances to generate.
+        :return: The generated GNN disturbance.
+        """
         fs = 1
         
         f0_array = np.round(np.random.uniform(0, fs/2, size=N), 4)
@@ -116,7 +153,7 @@ class GNN(Disturbance):
                     w[w < 0] = 0 # Ensure positive semi-definite covariance matrix
                     check = True
                 except:
-                    # in case of error generate a new pair of f0 and band
+                    # In case of error generate a new pair of f0 and band
                     f0 = np.random.uniform(0, fs/2)
                     band = np.random.uniform(0, fs/2 - np.abs(2*f0 - fs/2))
                     
@@ -128,60 +165,3 @@ class GNN(Disturbance):
             disturbance = disturbance[0]
                 
         return disturbance    
-    
-
-# class GNN(Disturbance):
-        
-#     def generate(self, N):
-                
-#         window='boxcar'
-#         pass_zero='bandpass'
-#         num_taps=1001
-#         length = self.n + num_taps
-#         fs = 1
-#         band = [0, fs/2]
-        
-#         i = 0
-        
-#         # generate bandwidths for each distrubance instance
-#         fmins_array = np.random.uniform(band[0], band[1], N)
-#         fmax_array = np.array(
-#             [np.random.uniform(fmin, band[1]) for fmin in fmins_array]
-#         )
-#         band_array = fmax_array - fmins_array
-#         f0_array = (fmins_array + fmins_array)/2
-        
-#         # define the lags        
-#         Cols = np.ones((self.n, self.n)) * np.arange(0, self.n)
-#         Rows = Cols.T
-#         Lags = Rows - Cols
-            
-#         disturbance = np.zeros((N, self.n))
-#         for f0, band in zip(f0_array, band_array):
-#             try:
-#                 disturbance[i] = np.random.multivariate_normal(
-#                     mean=np.zeros(self.n),
-#                     cov=np.cos(2*np.pi*Lags*f0) * np.sinc(Lags*band),
-#                     size=1)
-#             except:
-#                 awgn = np.random.normal(size=length)
-#                 taps = signal.firwin(
-#                     numtaps=num_taps,
-#                     cutoff=[f0 - band/2, f0 + band/2],
-#                     width=None,
-#                     window=window,
-#                     pass_zero=pass_zero,
-#                     scale=True,
-#                     fs=1
-#                 )
-#                 filtered = signal.lfilter(taps, 1.0, awgn)[num_taps : num_taps + self.n] 
-#                 disturbance[i] = filtered/ np.sqrt(np.sum(taps**2))
-                
-#             i = i+1
-            
-#         disturbance = self.a * disturbance
-        
-#         if N == 1:
-#             disturbance = disturbance[0]
-                
-#         return disturbance

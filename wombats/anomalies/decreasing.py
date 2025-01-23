@@ -63,7 +63,8 @@ class Decreasing(Anomaly):
         """
         Apply distortion to the normal data based on parameter p.
         
-        :param Xok: A 2D array with shape (N, n) containing the normal data.
+        :param Xok: A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
         :param p: The anomaly parameter controlling the probability of distortion
           of instance samples.
         :return: The distorted signal data.
@@ -76,7 +77,8 @@ class Decreasing(Anomaly):
         """
         Distort the signal data (to be implemented by subclasses).
         
-        :param Xok: TA 2D array with shape (N, n) containing the normal data.
+        :param Xok: A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
         :return: The distorted (anomalous) data.
         """
         
@@ -88,7 +90,8 @@ class Clipping(Decreasing):
         """
         Apply clipping distortion to the normal data.
         
-        :param Xok: A 2D array with shape (N, n) containing the normal data.
+        :param Xok: A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
         :return: The clipped data.
         """
         # Handle the limit cases
@@ -123,7 +126,8 @@ class DeadZone(Decreasing):
         """
         Apply dead-zone distortion to the normal data.
         
-        :param Xok: A 2D array with shape (N, n) containing the normal data.
+        :param Xok: A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
         :return: The distorted data with dead-zone effect.
         """
         # Handle the limit cases

@@ -27,7 +27,7 @@ class Anomaly():
         """
         return parameter
     
-    def fit(self, Xok: np.ndarray) -> 'Anomaly':
+    def fit(self, Xok: np.ndarray) -> "Anomaly":
         """
         Fits the anomaly model to the normal data to be distorted.
         
@@ -47,7 +47,8 @@ class Anomaly():
         Applies the anomaly to the given dataset.
         
         Parameters:
-            X (np.ndarray): A 2D array with shape (N, n) to distort.
+            X (np.ndarray): A 2D array with shape (N, n) or 1D array with shape (, n) 
+        containing the normal data.
         
         Returns:
             np.ndarray: Distorted data.
