@@ -391,8 +391,6 @@ class PrincipalSubspaceAlteration(CovarianceAlterations):
         """
         # Generate a random rotation matrix of angle theta 
         # altering the principal subspace
-        # genrate a random rotation matrix of angle theta 
-        # changing the principal subspace
         Q_ = np.random.normal(size=(self.n, self.n))    
         Q = linalg.orth(Q_)
         R_theta = Q @ self.Rb_theta @ Q.T

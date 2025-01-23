@@ -1,7 +1,5 @@
 import numpy as np
 from wombats.anomalies._base import Anomaly
-from scipy import signal
-import warnings
 
 class Disturbance(Anomaly):
     """
