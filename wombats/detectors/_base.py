@@ -7,8 +7,8 @@ def AUC(scores):
     return 1-roc_auc_score(labels, scores)
     
 def P_D(scores):
-        auc = AUC(scores)
-        return 0.5 + np.abs(0.5 - auc)
+    auc = AUC(scores)
+    return 0.5 + np.abs(0.5 - auc)
     
 class Detector():
     
