@@ -1,6 +1,20 @@
 from typing import Any
 import numpy as np
 
+def deviation(Xok: np.ndarray, Xko: np.ndarray) -> float:
+    """
+    A Monte Carlo Estimation of the deviation between two datasets.
+    
+    Parameters:
+        Xok (np.ndarray): A 2D array of normal data with shape (N, n).
+        Xko (np.ndarray): A 2D array of anomalous data with shape (N, n).
+    
+    Returns:
+        float: Mean squared deviation between the datasets.
+    """
+    n = Xok.shape[-1]
+    return np.mean(np.sum((Xok - Xko)**2, axis=1) / n)
+
 class Anomaly():
     '''
     Parent class defining a template for 
