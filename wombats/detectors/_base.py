@@ -3,7 +3,7 @@ from sklearn.metrics import roc_auc_score
 
 def AUC(scores: np.ndarray) -> float:
     """
-    Calculate the AUC metric based on the scores.
+    Calculate the area under the (ROC) curve metric based on the scores.
     
     :param scores: A 1D with shape (, 2N) array containing
       the N scores for normal data and N scores for anomalous data.
@@ -15,7 +15,7 @@ def AUC(scores: np.ndarray) -> float:
     
 def P_D(scores: np.ndarray) -> float:
     """
-    Calculate the P_D metric based on the AUC.
+    Calculate the probability of detection metric based on the AUC.
     
     :param scores:  A 1D with shape (, 2N) array containing
       the N scores for normal data and N scores for anomalous data.
@@ -44,20 +44,22 @@ class Detector():
         """
         Fit the detector to the training dataset.
         
-        :param Xok_train: A 2D array with shape (N, n) containing the training set of normal data.
+        :param Xok_train: A 2D array with shape (N_train, n) containing the training set of normal data.
         :return: None.
         :raises NotImplementedError: If the method is not implemented.
         """
+        # TODO: implement std and mean computation for scaling in the scoring phase
         raise NotImplementedError("The 'fit' method must be implemented by subclasses.")
     
-    def score(self, X_test: np.ndarray) -> np.ndarray:
+    def score(self, X: np.ndarray) -> np.ndarray:
         """
         Compute anomaly scores for the test dataset 
         
-        :param X_test: A 2D array with shape (2N, n) containing containing N normal Xok instances and N Xko instances.
-        :return: A 1D with shape (, 2N) array containing the anomaly scores.
+        :param X: A 2D array with shape (N, n) containing the test data.
+        :return: A 1D array with shape (, N) containing the anomaly scores.
         :raises NotImplementedError: If the method is not implemented.
         """
+        # TODO: implement std and mean scaling
         raise NotImplementedError("The 'score' method must be implemented by subclasses.")
         
     def test(self, X_test: np.ndarray, metric: str) -> float:
