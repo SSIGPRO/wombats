@@ -24,7 +24,6 @@ class MD(Detector):
         data is expected to be properly scaled: 0 mean and average per sample energy equal 1.
         :return: self (for compatibility with scikit-learn API).
         """
-        super().fit(X_train)
         N = X_train.shape[-2]
         self.Sok = 1/(N-1) * X_train.T @ X_train
         eigvals, eigvecs = np.linalg.eigh(self.Sok)
