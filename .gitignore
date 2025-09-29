@@ -1,9 +1,10 @@
- wombats/detectors/__pycache__/
- wombats/detectors/.ipynb_checkpoints/
- wombats/anomalies/__pycache__/
- wombats/anomalies/.ipynb_checkpoints/
- wombats/anomalies/ipynb_checkpoints/
- wombats/notebooks/.ipynb_checkpoints/
- wombats/.ipynb_checkpoints/
- wombats/notebooks/figures
- wombats/notebooks/.ipynb_checkpoints/git st
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# Notebook figures
+wombats/notebooks/figures/
