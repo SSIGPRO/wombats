@@ -122,7 +122,7 @@ class GNN(Disturbance):
         
     def generate(self, N: int) -> np.ndarray:
         """
-        Generate Gaussian noise with a non-stationary spectrum (GNN).
+        Generate Gaussian noise with a narrowband spectrum (GNN).
         
         :param N: The number of instances to generate.
         :return: The generated GNN disturbance.
